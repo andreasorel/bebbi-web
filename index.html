@@ -80,12 +80,12 @@
           <p class="sub">Bebbi synkroniseres mellom telefonene deres, så dere alltid ser det samme.</p>
         </div>
         <div class="features">
-          <div class="feature bg-peri"><img src="assets/img/bebbi-couple.webp" alt="" loading="lazy"><h3>Sammen, privat</h3><p>Inviter partneren din med en kode. Sveip i eget tempo, og få beskjed når dere matcher.</p></div>
-          <div class="feature bg-lavender"><img src="assets/img/bebbi-gift.webp" alt="" loading="lazy"><h3>Ønskeliste</h3><p>Del en ønskeliste med familie og venner. De trykker «Jeg kjøper denne», så ingen kjøper det samme to ganger.</p></div>
-          <div class="feature bg-butter"><img src="assets/img/bebbi-shopping.webp" alt="" loading="lazy"><h3>Tilbud og babyklubber</h3><p>Gratis babybokser og klubber dere bør bli med i, og rabattkoder på utstyret dere faktisk trenger.</p></div>
-          <div class="feature bg-mint"><img src="assets/img/bebbi-checklist.webp" alt="" loading="lazy"><h3>Gjøremål</h3><p>Sykehusbag, bilstol, foreldrepenger hos NAV og alt det andre, med frister basert på terminen.</p></div>
-          <div class="feature bg-sky"><img src="assets/img/cat-stroller.webp" alt="" loading="lazy"><h3>Ærlige anbefalinger</h3><p>Produkter valgt ut fra hvordan dere bor: trapp eller heis, bil eller buss, budsjett og vinter.</p></div>
-          <div class="feature bg-blush"><img src="assets/img/bebbi-celebrate.webp" alt="" loading="lazy"><h3>Notater og varsler</h3><p>Skriv notater på hver ting og få et lite «Bebbi!» når partneren din legger til noe.</p></div>
+          <div class="feature bg-peri"><div class="feature-head"><img class="accent" src="assets/img/bebbi-couple.webp" alt=""><h3>Sammen, privat</h3></div><p>Inviter partneren din med en kode. Sveip i eget tempo, og få beskjed når dere matcher.</p><div class="phone small"><img src="assets/img/feat-partner.webp" alt="Ingrid er med i Bebbi" loading="lazy"></div></div>
+          <div class="feature bg-lavender"><div class="feature-head"><img class="accent" src="assets/img/bebbi-gift.webp" alt=""><h3>Ønskeliste</h3></div><p>Del en ønskeliste med familie og venner. De trykker «Jeg kjøper denne», så ingen kjøper det samme to ganger.</p><div class="phone small"><img src="assets/img/feat-wish.webp" alt="Ønskelisten i Bebbi" loading="lazy"></div></div>
+          <div class="feature bg-butter"><div class="feature-head"><img class="accent" src="assets/img/bebbi-shopping.webp" alt=""><h3>Tilbud og babyklubber</h3></div><p>Gratis babybokser og klubber dere bør bli med i, og rabattkoder på utstyret dere faktisk trenger.</p><div class="phone small"><img src="assets/img/feat-deals.webp" alt="Babyklubber i Bebbi" loading="lazy"></div></div>
+          <div class="feature bg-mint"><div class="feature-head"><img class="accent" src="assets/img/bebbi-checklist.webp" alt=""><h3>Gjøremål</h3></div><p>Sykehusbag, bilstol, foreldrepenger hos NAV og alt det andre, med frister basert på terminen.</p><div class="phone small"><img src="assets/img/feat-todos.webp" alt="Gjøremål i Bebbi" loading="lazy"></div></div>
+          <div class="feature bg-sky"><div class="feature-head"><img class="accent" src="assets/img/cat-stroller.webp" alt=""><h3>Ærlige anbefalinger</h3></div><p>Produkter valgt ut fra hvordan dere bor. Sammenlign favorittene side om side og velg sammen.</p><div class="phone small"><img src="assets/img/feat-compare.webp" alt="Sammenlign barnevogner i Bebbi" loading="lazy"></div></div>
+          <div class="feature bg-blush"><div class="feature-head"><img class="accent" src="assets/img/bebbi-celebrate.webp" alt=""><h3>Notater og varsler</h3></div><p>Skriv notater på hver ting og få et lite «Bebbi!» når partneren din legger til noe.</p><div class="phone small"><img src="assets/img/feat-home.webp" alt="Hjem-skjermen med et nytt notat fra partneren" loading="lazy"></div></div>
         </div>
       </div>
     </section>
@@ -147,8 +147,16 @@
         <div class="band">
           <img src="assets/img/bebbi-celebrate.webp" alt="" loading="lazy">
           <h2>Vil du være blant de første?</h2>
-          <p class="sub" style="margin:0 auto 26px">Send oss en e-post, så gir vi beskjed når Bebbi er klar for nedlasting.</p>
-          <a class="btn" href="mailto:hei@bebbi.no?subject=Gi%20meg%20beskjed%20n%C3%A5r%20Bebbi%20lanseres">Gi meg beskjed</a>
+          <p class="sub" style="margin:0 auto 26px">Skriv inn e-postadressen din, så gir vi beskjed når Bebbi er klar i App Store.</p>
+          <form id="waitlist" class="signup" novalidate>
+            <div class="row">
+              <input type="email" name="email" placeholder="din@epost.no" autocomplete="email" required aria-label="E-postadresse">
+              <button class="btn" type="submit">Gi meg beskjed</button>
+            </div>
+            <label class="consent"><input type="checkbox" name="consent" required>
+              <span id="consent-text">Ja, send meg e-post om lanseringen og nyheter fra Bebbi. Jeg kan melde meg av når som helst.</span></label>
+            <p class="msg" role="status" aria-live="polite"></p>
+          </form>
         </div>
       </div>
     </section>
@@ -168,5 +176,29 @@
       </div>
     </div>
   </footer>
+  <script>
+    // Sign-ups go to Supabase (EU) through a function that only accepts new addresses; the list can't be read from the web.
+    const form = document.getElementById("waitlist");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = form.querySelector(".msg"), btn = form.querySelector("button");
+      const email = form.email.value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = "Sjekk at e-postadressen er riktig."; msg.className = "msg err"; return; }
+      if (!form.consent.checked) { msg.textContent = "Kryss av for at vi kan sende deg e-post."; msg.className = "msg err"; return; }
+      btn.disabled = true; msg.textContent = "Sender …"; msg.className = "msg";
+      try {
+        const res = await fetch("https://wlfxuttksnyatygihozf.supabase.co/rest/v1/rpc/join_waitlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: "sb_publishable_XiqRj8SErbb6xRQ3PgfK0Q_QXgClA-h" },
+          body: JSON.stringify({ p_email: email, p_consent: true, p_consent_text: document.getElementById("consent-text").textContent.trim(), p_language: "nb" }),
+        });
+        if (!res.ok) throw new Error();
+        form.innerHTML = '<p class="ok">Takk! Du er på listen 💛 Bebbi sier ifra når appen er klar.</p>';
+      } catch {
+        msg.textContent = "Noe gikk galt. Prøv igjen, eller send oss en e-post på hei@bebbi.no."; msg.className = "msg err";
+        btn.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>

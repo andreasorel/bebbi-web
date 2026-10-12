@@ -145,3 +145,26 @@ footer img { height: 26px; margin-bottom: 10px; }
 .doc th { background: var(--periwinkle); }
 
 section[id] { scroll-margin-top: 76px; }
+
+/* Feature cards with app screenshots */
+.feature { display: flex; flex-direction: column; }
+.feature-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.feature-head img.accent { width: 54px; height: 54px; object-fit: contain; margin: 0; }
+.feature-head h3 { margin: 0; }
+.feature p { margin-bottom: 18px; }
+.phone.small { max-width: 230px; margin-top: auto; border-radius: 28px; border-width: 5px; }
+.feature .phone img { width: 100%; height: auto; margin: 0; }
+
+/* Sign-up form */
+.signup { max-width: 520px; margin: 0 auto; text-align: left; }
+.signup .row { display: flex; gap: 10px; }
+.signup input[type=email] { flex: 1; min-width: 0; padding: 15px 18px; border-radius: 999px; border: 2px solid transparent; background: #fff; font: inherit; font-size: 16px; color: var(--ink); box-shadow: var(--shadow); }
+.signup input[type=email]:focus { outline: none; border-color: var(--accent); }
+.signup button { border: 0; cursor: pointer; font-family: inherit; }
+.signup button:disabled { opacity: .6; cursor: default; }
+.signup .consent { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; font-size: 14px; color: var(--muted); cursor: pointer; }
+.signup .consent input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+.signup .msg { min-height: 1.4em; margin: 10px 0 0; font-size: 14px; }
+.signup .msg.err { color: #C2416B; }
+.signup .ok { text-align: center; font-size: 18px; font-weight: 700; margin: 0; }
+@media (max-width: 560px) { .signup .row { flex-direction: column; } .signup .row .btn { justify-content: center; } }
