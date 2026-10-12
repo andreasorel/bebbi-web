@@ -168,3 +168,6 @@ section[id] { scroll-margin-top: 76px; }
 .signup .msg.err { color: #C2416B; }
 .signup .ok { text-align: center; font-size: 18px; font-weight: 700; margin: 0; }
 @media (max-width: 560px) { .signup .row { flex-direction: column; } .signup .row .btn { justify-content: center; } }
+
+/* Animated hero Bebbi (white video background disappears with multiply) */
+.hero-art .bebbi-video { position: relative; display: block; width: min(440px, 82vw); aspect-ratio: 1; mix-blend-mode: multiply; background: transparent; }

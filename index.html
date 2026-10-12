@@ -39,7 +39,10 @@
         </div>
         <div class="hero-art">
           <div class="circle"></div>
-          <img src="assets/img/bebbi-wave.webp" alt="Bebbi, en liten dråpe med krøll, vinker">
+          <video class="bebbi-video" autoplay muted loop playsinline preload="auto" poster="assets/img/bebbi-hero-poster.webp" aria-label="Bebbi, en liten dråpe med krøll, vinker og blunker">
+            <source src="assets/img/bebbi-hero.webm" type="video/webm">
+            <source src="assets/img/bebbi-hero.mp4" type="video/mp4">
+          </video>
         </div>
       </div>
     </section>
@@ -177,6 +180,11 @@
     </div>
   </footer>
   <script>
+    // Respect reduced motion: show Bebbi's still frame instead of the loop.
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const v = document.querySelector(".bebbi-video"); v.removeAttribute("autoplay"); v.pause();
+    }
+
     // Sign-ups go to Supabase (EU) through a function that only accepts new addresses; the list can't be read from the web.
     const form = document.getElementById("waitlist");
     form.addEventListener("submit", async (e) => {
