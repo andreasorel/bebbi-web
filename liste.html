@@ -32,6 +32,7 @@
     .body .note { margin: 4px 0 0; color: var(--muted); font-size: 15px; overflow-wrap: anywhere; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
     .actions .btn { padding: 10px 16px; font-size: 15px; }
+    .actions .btn:disabled { opacity: .55; cursor: default; transform: none; }
     .actions a.shop { font-weight: 700; color: var(--accent-deep); font-size: 15px; }
     .tag { display: inline-block; padding: 5px 12px; border-radius: 999px; background: var(--mint); font-weight: 700; font-size: 14px; }
     form.reserve { display: flex; gap: 8px; width: 100%; margin-top: 4px; }
@@ -70,6 +71,8 @@
       var params = new URLSearchParams(location.search);
       var raw = params.get("c") || (location.pathname.match(/^\/list\/([^/?#]+)/) || [])[1] || "";
       var code = raw.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 24);
+      // Opened from the app by the parents: show the page, but nothing can be reserved.
+      var preview = params.get("preview") === "1";
       var box = document.getElementById("items");
 
       function el(tag, cls, text) {
@@ -107,6 +110,7 @@
           document.getElementById("sub").textContent = "Termin " + d.toLocaleDateString("nb-NO", { day: "numeric", month: "long", year: "numeric" });
         }
         document.getElementById("how").hidden = false;
+        if (preview) document.getElementById("how").textContent = "Slik ser venner og familie listen. De kan trykke «Jeg gir denne» – det kan ikke du her.";
         rows.sort(function (a, b) { return (a.reserved - b.reserved) || (a.sort_order - b.sort_order); });
         box.textContent = "";
         rows.forEach(function (row) { box.appendChild(item(row)); });
@@ -147,7 +151,12 @@
         } else {
           var give = el("button", "btn", "Jeg gir denne");
           give.type = "button";
-          give.addEventListener("click", function () { askName(actions, row); });
+          if (preview) {
+            give.disabled = true;
+            give.title = "Venner og familie kan reservere her";
+          } else {
+            give.addEventListener("click", function () { askName(actions, row); });
+          }
           actions.appendChild(give);
         }
         if (row.product_shop && row.product_id && !row.reserved) {
