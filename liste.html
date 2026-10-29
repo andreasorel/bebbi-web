@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ønskeliste – Bebbi</title>
+  <meta name="description" content="Ønskelisten til den lille som kommer. Reserver det du vil gi, så ingen kjøper det samme.">
+  <meta property="og:title" content="Ønskeliste til babyen 🎁">
+  <meta property="og:description" content="Se hva de ønsker seg, og reserver det du vil gi.">
+  <meta property="og:image" content="https://bebbi.no/assets/img/og.png">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FFF8F3">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="stylesheet" href="/assets/style.css">
+  <style>
+    .list { max-width: 640px; margin: 0 auto; padding: 28px 18px 80px; }
+    .list header { text-align: center; margin-bottom: 22px; }
+    .list header img { width: 130px; display: block; margin: 0 auto; }
+    .list h1 { font-size: clamp(28px, 6vw, 38px); margin: 8px 0 4px; }
+    .list .meta { color: var(--muted); margin: 0; }
+    .how { background: var(--periwinkle); border-radius: 18px; padding: 12px 16px; font-size: 15px; margin: 0 0 18px; }
+    .item { display: flex; gap: 14px; align-items: flex-start; background: var(--card); border-radius: 22px;
+            box-shadow: var(--shadow); padding: 16px; margin: 12px 0; }
+    .item.taken { opacity: .6; }
+    .thumb { width: 64px; height: 64px; flex: none; border-radius: 16px; background: var(--sky); display: grid;
+             place-items: center; font-size: 30px; overflow: hidden; }
+    .thumb img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
+    .thumb img.icon { width: 80%; height: 80%; background: none; }
+    .body { flex: 1; min-width: 0; }
+    .body h2 { font-size: 18px; margin: 0 0 2px; }
+    .body .product { margin: 0; font-weight: 600; }
+    .body .note { margin: 4px 0 0; color: var(--muted); font-size: 15px; overflow-wrap: anywhere; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+    .actions .btn { padding: 10px 16px; font-size: 15px; }
+    .actions a.shop { font-weight: 700; color: var(--accent-deep); font-size: 15px; }
+    .tag { display: inline-block; padding: 5px 12px; border-radius: 999px; background: var(--mint); font-weight: 700; font-size: 14px; }
+    form.reserve { display: flex; gap: 8px; width: 100%; margin-top: 4px; }
+    form.reserve input { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(61,51,70,.2); font: inherit; }
+    .empty, .error { text-align: center; color: var(--muted); padding: 30px 0; }
+    .fine { color: var(--muted); font-size: 13px; text-align: center; margin-top: 26px; }
+  </style>
+</head>
+<body>
+  <main class="list">
+    <header>
+      <a href="/" aria-label="Bebbi"><img src="/assets/img/bebbi-thinking.webp" alt=""></a>
+      <h1 id="title">Ønskeliste</h1>
+      <p class="meta" id="sub"></p>
+    </header>
+    <p class="how" id="how" hidden>Vil du gi noe? Trykk <strong>«Jeg gir denne»</strong>, så vet de andre at den er tatt. Foreldrene ser navnet du skriver.</p>
+    <div id="items"><p class="empty">Henter ønskelisten …</p></div>
+    <p class="fine">Laget med <a href="/">Bebbi</a>. Noen lenker er annonselenker: butikken gir oss en liten provisjon, prisen din blir den samme.</p>
+  </main>
+  <script>
+    (function () {
+      var API = "https://wlfxuttksnyatygihozf.supabase.co";
+      // Publishable key: safe in the browser, the database only allows the two wish-list functions.
+      var KEY = "sb_publishable_XiqRj8SErbb6xRQ3PgfK0Q_QXgClA-h";
+      var NAMES = {
+        stroller: ["Barnevogn", "🚼"], prampBag: ["Vognpose", "🧣"], prampCovers: ["Regntrekk og myggnett", "☔"],
+        carrier: ["Bæresele", "🦘"], changingBag: ["Stellebag", "👜"], carSeat: ["Babybilstol", "🚗"],
+        travelCot: ["Reiseseng", "⛺"], bedside: ["Sidevogn", "🛏️"], sleepingBag: ["Soveposer", "😴"],
+        monitor: ["Babycall", "📹"], nursingPillow: ["Ammepute", "🤱"], breastPump: ["Brystpumpe", "🍼"],
+        bottles: ["Tåteflasker", "🍼"], sterilizer: ["Flaskesterilisator", "♨️"], bottleWarmer: ["Flaskevarmer", "🍼"],
+        bibs: ["Smekker og stofflapper", "🧷"], nappies: ["Bleier", "🧺"], changingMat: ["Stellematte", "🧸"],
+        bath: ["Badebalje", "🛁"], thermometer: ["Termometer", "🌡️"], wipeWarmer: ["Servietvarmer", "🧻"],
+        clothes: ["Nyfødtklær", "👕"], bouncer: ["Vippestol", "🪑"], playMat: ["Lekematte", "🧩"]
+      };
+
+      var params = new URLSearchParams(location.search);
+      var raw = params.get("c") || (location.pathname.match(/^\/list\/([^/?#]+)/) || [])[1] || "";
+      var code = raw.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 24);
+      var box = document.getElementById("items");
+
+      function el(tag, cls, text) {
+        var e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (text != null) e.textContent = text;
+        return e;
+      }
+      function message(text, cls) {
+        box.textContent = "";
+        box.appendChild(el("p", cls || "empty", text));
+      }
+      function rpc(name, body) {
+        return fetch(API + "/rest/v1/rpc/" + name, {
+          method: "POST",
+          headers: { apikey: KEY, Authorization: "Bearer " + KEY, "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        }).then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          return r.json();
+        });
+      }
+
+      if (!code) { message("Denne lenken mangler ønskelistekoden. Be foreldrene dele lenken på nytt fra Bebbi."); return; }
+
+      function render(rows) {
+        if (!rows.length) { message("Ønskelisten er tom eller finnes ikke lenger. Spør foreldrene om en ny lenke."); return; }
+        var first = rows[0];
+        if (first.first_names) {
+          document.getElementById("title").textContent = "Ønskelisten til " + first.first_names;
+          document.title = "Ønskelisten til " + first.first_names + " – Bebbi";
+        }
+        if (first.due_date) {
+          var d = new Date(first.due_date + "T12:00:00");
+          document.getElementById("sub").textContent = "Termin " + d.toLocaleDateString("nb-NO", { day: "numeric", month: "long", year: "numeric" });
+        }
+        document.getElementById("how").hidden = false;
+        rows.sort(function (a, b) { return (a.reserved - b.reserved) || (a.sort_order - b.sort_order); });
+        box.textContent = "";
+        rows.forEach(function (row) { box.appendChild(item(row)); });
+      }
+
+      function item(row) {
+        var known = NAMES[row.category_id];
+        var card = el("article", "item" + (row.reserved ? " taken" : ""));
+        var thumb = el("div", "thumb");
+        if (row.product_image) {
+          var img = el("img");
+          img.src = row.product_image;
+          img.alt = "";
+          img.loading = "lazy";
+          thumb.appendChild(img);
+        } else if (known && !row.custom) {
+          var icon = el("img", "icon");
+          icon.src = "/assets/img/cat/" + row.category_id + ".png";
+          icon.alt = "";
+          thumb.appendChild(icon);
+        } else {
+          thumb.textContent = "🎁";
+        }
+        card.appendChild(thumb);
+
+        var body = el("div", "body");
+        var title = known && !row.custom ? known[0] : row.category_name;
+        if (row.quantity > 1) title += " × " + row.quantity;
+        body.appendChild(el("h2", null, title));
+        if (row.product_name) {
+          body.appendChild(el("p", "product", [row.product_brand, row.product_name].filter(Boolean).join(" ")));
+        }
+        if (row.note) body.appendChild(el("p", "note", row.note));
+
+        var actions = el("div", "actions");
+        if (row.reserved) {
+          actions.appendChild(el("span", "tag", "Noen gir denne 🎁"));
+        } else {
+          var give = el("button", "btn", "Jeg gir denne");
+          give.type = "button";
+          give.addEventListener("click", function () { askName(actions, row); });
+          actions.appendChild(give);
+        }
+        if (row.product_shop && row.product_id && !row.reserved) {
+          var shop = el("a", "shop", "Se pris →");
+          shop.href = API + "/functions/v1/go/" + encodeURIComponent(row.product_id) + "?s=wishlist";
+          shop.rel = "sponsored noopener";
+          shop.target = "_blank";
+          actions.appendChild(shop);
+        }
+        body.appendChild(actions);
+        card.appendChild(body);
+        return card;
+      }
+
+      function askName(actions, row) {
+        actions.textContent = "";
+        var form = el("form", "reserve");
+        var input = el("input");
+        input.placeholder = "Navnet ditt (valgfritt)";
+        input.maxLength = 60;
+        input.autocomplete = "given-name";
+        var ok = el("button", "btn", "Reserver");
+        ok.type = "submit";
+        form.appendChild(input);
+        form.appendChild(ok);
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          ok.disabled = true;
+          rpc("reserve_wishlist_item", { code: code, p_category_id: row.category_id, p_name: input.value.trim() || null })
+            .then(function (done) {
+              actions.textContent = "";
+              actions.appendChild(el("span", "tag", done ? "Takk! Den er reservert til deg 🎁" : "Noen rakk det før deg 🎁"));
+              actions.closest(".item").classList.add("taken");
+            })
+            .catch(function () {
+              ok.disabled = false;
+              ok.textContent = "Prøv igjen";
+            });
+        });
+        actions.appendChild(form);
+        input.focus();
+      }
+
+      rpc("public_wishlist", { code: code }).then(render).catch(function () {
+        message("Vi fikk ikke hentet ønskelisten akkurat nå. Prøv igjen om litt.", "error");
+      });
+    })();
+  </script>
+</body>
+</html>

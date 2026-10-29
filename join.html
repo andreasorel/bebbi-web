@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Du er invitert til Bebbi</title>
+  <meta name="description" content="Partneren din har invitert deg til Bebbi. Last ned appen og skriv inn koden.">
+  <meta property="og:title" content="Du er invitert til Bebbi 💛">
+  <meta property="og:description" content="Planlegg babyutstyret sammen. Last ned Bebbi og bli med med koden din.">
+  <meta property="og:image" content="https://bebbi.no/assets/img/og.png">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FFF8F3">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="stylesheet" href="/assets/style.css">
+  <style>
+    .invite { max-width: 520px; margin: 0 auto; padding: 32px 22px 80px; text-align: center; }
+    .invite img.bebbi { width: 170px; margin: 8px auto 0; display: block; }
+    .invite h1 { font-size: clamp(30px, 7vw, 40px); margin: 10px 0 6px; }
+    .invite .lead { color: var(--muted); margin: 0 0 22px; }
+    .code { display: inline-flex; gap: 6px; margin: 6px 0 10px; }
+    .code span { width: 44px; height: 56px; display: grid; place-items: center; background: var(--card); border-radius: 14px;
+                 box-shadow: var(--shadow); font: 700 28px ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink); }
+    .copy { background: none; border: 0; color: var(--accent-deep); font: inherit; font-weight: 700; cursor: pointer; padding: 8px; }
+    .steps-list { text-align: left; background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 18px 22px; margin: 22px 0; }
+    .steps-list li { margin: 8px 0; }
+    .store { display: inline-block; margin-top: 4px; }
+    .note { color: var(--muted); font-size: 14px; margin-top: 18px; }
+  </style>
+</head>
+<body>
+  <main class="invite">
+    <a href="/" aria-label="Bebbi"><img class="bebbi" src="/assets/img/bebbi-thinking.webp" alt=""></a>
+    <h1>Du er invitert 💛</h1>
+    <p class="lead">Partneren din vil planlegge babyutstyret sammen med deg i Bebbi.</p>
+
+    <div id="has-code" hidden>
+      <div class="code" id="code" aria-label="Invitasjonskode"></div>
+      <div><button class="copy" id="copy" type="button">Kopier koden</button></div>
+    </div>
+
+    <ol class="steps-list">
+      <li>Last ned Bebbi på iPhonen din.</li>
+      <li>Trykk <strong>«Jeg har en invitasjonskode»</strong>.</li>
+      <li id="step3">Skriv inn koden fra invitasjonen.</li>
+    </ol>
+
+    <a class="btn store" href="https://apps.apple.com/no/app/id6821700507">Last ned Bebbi</a>
+    <p class="note">Har du allerede Bebbi? Trykk på lenken i meldingen igjen, så åpnes appen med koden.</p>
+  </main>
+  <script>
+    (function () {
+      // The code comes from /join/ABC123 (sent here by 404.html) or ?c=ABC123.
+      var params = new URLSearchParams(location.search);
+      var raw = params.get("c") || (location.pathname.match(/^\/join\/([^/?#]+)/) || [])[1] || "";
+      var code = raw.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+      if (code.length !== 6) return;
+      var box = document.getElementById("code");
+      code.split("").forEach(function (ch) {
+        var s = document.createElement("span");
+        s.textContent = ch;
+        box.appendChild(s);
+      });
+      document.getElementById("has-code").hidden = false;
+      document.getElementById("step3").textContent = "Skriv inn koden " + code + ".";
+      var btn = document.getElementById("copy");
+      btn.addEventListener("click", function () {
+        if (!navigator.clipboard) return;
+        navigator.clipboard.writeText(code).then(function () {
+          btn.textContent = "Kopiert ✓";
+          setTimeout(function () { btn.textContent = "Kopier koden"; }, 2000);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

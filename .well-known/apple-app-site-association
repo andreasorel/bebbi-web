@@ -1,0 +1,12 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["5DDLXZX8CY.com.androla.Baby-Gear"],
+        "components": [
+          { "/": "/join/*", "comment": "Partner invites open the join screen in the app" }
+        ]
+      }
+    ]
+  }
+}
