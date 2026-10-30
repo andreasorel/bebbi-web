@@ -52,8 +52,8 @@
       // The code comes from /join/ABC123 (sent here by 404.html) or ?c=ABC123.
       var params = new URLSearchParams(location.search);
       var raw = params.get("c") || (location.pathname.match(/^\/join\/([^/?#]+)/) || [])[1] || "";
-      var code = raw.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
-      if (code.length !== 6) return;
+      var code = raw.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+      if (code.length < 6) return;  // 8 characters now, 6 in older invites
       var box = document.getElementById("code");
       code.split("").forEach(function (ch) {
         var s = document.createElement("span");
